@@ -1,0 +1,101 @@
+---
+title: "Statistical inference with the GSS data"
+output:
+  html_document:
+    fig_height: 4
+    highlight: pygments
+    theme: spacelab
+  pdf_document: default
+---
+
+## Setup
+
+### Load packages
+
+```{r load-packages, message = FALSE}
+library(ggplot2)
+library(dplyr)
+library(statsr)
+```
+
+### Load data
+When the data is loaded, the data file will be called `gss`. 
+
+```{r load-data}
+load("gss.Rdata")
+```
+
+Get an overview of the data set.
+
+```{r summary}
+summary(gss)
+```
+* * *
+
+## Part 1: Data
+
+This data set contains a lot of information. We probably won't need all of the columns to answer one questions, so we will need to subset our data according the question we want to answer. 
+
+The data set is extracted from the GSS conducted by the NORC at the University of Chicago. This data set is cleaned (missing values are removed and equipped with factor variables). The responses are from a representative sample of Americans about a range of topics. There are 57061 responses (the sample size is 57061), which is less than 10% of the population in the United States. Thus it is reasonable to assume the independence of the sampling corresponding to this data set.
+
+* * *
+
+## Part 2: Research question
+Let's come up with our first question: **what is the percentage of US-born adults (18y/o +) who are employed full (Labor force status) time in year 2008.**
+
+* * *
+
+## Part 3: Exploratory data analysis
+
+First, notice the min age in this data set is 18 y/o, so we don't need to worry about age column. Let's subset related columns (`year`,`wrkstat`,`born`) and store it in `full08`
+
+``` {subset step 1}
+wrk <- gss[c('year','wrkstat','born')]
+```
+
+Then, let's focus on `year=2008` who works full time:
+
+``` {subset step 2}
+full08 <- subset(wrk, year == 2008 & wrkstat == 'Working Fulltime', select = born)
+full08
+```
+
+Let's drop all the <NA> responses if there is any:
+
+```{drop na}
+full08 <- full08 %>% filter(!is.na(born))
+full08
+```
+
+* * *
+
+## Part 4: Inference
+
+Let's first calculate **a 95% confidence interval of the proportion** of U.S. Citizens who are full time employed adults among the sample. There are a total of 1003 responses.
+
+```{responses}
+dim(full08)
+```
+
+Among them, 850 responded 'Yes' and 153 responded 'No'. Both of these numbers are greater than 10.
+
+```{summary}
+summary(full08)
+```
+
+It satisfies the conditions for CLT for proportions.
+
+```{inference ci}
+inference(born,data=full08,statistic='proportion',type='ci',method='theoretical',success='Yes')
+```
+
+A 95% confidence interval for the proportion of US-born adult working full time in 2008 among all adult working full time in 2008 is (0.8252 , 0.8697). 
+
+Next, let's claim that 90% of adults who works full time in 2008 are born in the US. In this case, our null hypothesis is $H_0 = \underline{p=0.9}$ and the alternative is $H_A = \underline{p\neq 0.9}.$
+
+```{inference ht}
+inference(full08$born,data=full08,statistic='proportion',type='ht',alternative='twosided',method='theoretical',success='Yes',null=0.9)
+
+```
+
+We get a $p-$value $< 0.0001$, with a $5\%$ significance leve, we absolutely reject out null hypothesis. 
