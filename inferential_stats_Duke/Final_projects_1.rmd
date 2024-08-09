@@ -98,4 +98,4 @@ inference(full08$born,data=full08,statistic='proportion',type='ht',alternative='
 
 ```
 
-We get a $p-$value $< 0.0001$, with a $5\%$ significance leve, we absolutely reject out null hypothesis. 
+We get a $p-$value $< 0.0001$, with a $5\%$ significance level, we absolutely reject out null hypothesis. 
