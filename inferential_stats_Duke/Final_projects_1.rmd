@@ -1,11 +1,11 @@
 ---
 title: "Statistical inference with the GSS data"
 output:
+  pdf_document: default
   html_document:
     fig_height: 4
     highlight: pygments
     theme: spacelab
-  pdf_document: default
 ---
 
 ## Setup
@@ -49,20 +49,20 @@ Let's come up with our first question: **what is the percentage of US-born adult
 
 First, notice the min age in this data set is 18 y/o, so we don't need to worry about age column. Let's subset related columns (`year`,`wrkstat`,`born`) and store it in `full08`
 
-``` {subset step 1}
+``` {r}
 wrk <- gss[c('year','wrkstat','born')]
 ```
 
 Then, let's focus on `year=2008` who works full time:
 
-``` {subset step 2}
+``` {r}
 full08 <- subset(wrk, year == 2008 & wrkstat == 'Working Fulltime', select = born)
 full08
 ```
 
 Let's drop all the <NA> responses if there is any:
 
-```{drop na}
+```{r}
 full08 <- full08 %>% filter(!is.na(born))
 full08
 ```
@@ -73,19 +73,19 @@ full08
 
 Let's first calculate **a 95% confidence interval of the proportion** of U.S. Citizens who are full time employed adults among the sample. There are a total of 1003 responses.
 
-```{responses}
+```{r}
 dim(full08)
 ```
 
 Among them, 850 responded 'Yes' and 153 responded 'No'. Both of these numbers are greater than 10.
 
-```{summary}
+```{r}
 summary(full08)
 ```
 
 It satisfies the conditions for CLT for proportions.
 
-```{inference ci}
+```{r}
 inference(born,data=full08,statistic='proportion',type='ci',method='theoretical',success='Yes')
 ```
 
@@ -93,7 +93,7 @@ A 95% confidence interval for the proportion of US-born adult working full time 
 
 Next, let's claim that 90% of adults who works full time in 2008 are born in the US. In this case, our null hypothesis is $H_0 = \underline{p=0.9}$ and the alternative is $H_A = \underline{p\neq 0.9}.$
 
-```{inference ht}
+```{r}
 inference(full08$born,data=full08,statistic='proportion',type='ht',alternative='twosided',method='theoretical',success='Yes',null=0.9)
 
 ```
