@@ -251,7 +251,7 @@ actual1 <- mlb11 %>%
 
 x1 <- data.frame(at_bats=c(5579))
 p1 <- predict(m1,x1)
-p1 - actual1
+actual1 - p1
 ```
 
 ## Model diagnostics
